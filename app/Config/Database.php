@@ -26,10 +26,10 @@ class Database extends Config
      */
     public array $default = [
         'DSN' => '',
-        'hostname' => 'localhost',
-        'username' => 'postgres',
-        'password' => '1234',
-        'database' => 'tmnotes', //Nombre de la base de datos configurada                            // en el sistema
+        'hostname' => '',
+        'username' => '',
+        'password' => '',
+        'database' => '',
         'schema' => 'public',
         'DBDriver' => 'Postgre',
         'DBPrefix' => '',
@@ -187,6 +187,12 @@ class Database extends Config
     public function __construct()
     {
         parent::__construct();
+
+        $this->default['hostname'] = getenv('DB_HOST') ?: env('database.default.hostname', 'localhost');
+        $this->default['username'] = getenv('DB_USER') ?: env('database.default.username', 'postgres');
+        $this->default['password'] = getenv('DB_PASSWORD') ?: env('database.default.password', 'Ramos200220');
+        $this->default['database'] = getenv('DB_NAME') ?: env('database.default.database', 'tmnotes');
+        $this->default['port'] = (int) (getenv('DB_PORT') ?: env('database.default.port', 5432));
 
         // Ensure that we always set the database group to 'tests' if
         // we are currently running an automated test suite, so that

@@ -19,7 +19,7 @@
                         <div class="navbar-fixed">
                             <nav class="teal">
                                 <div class="nav-wrapper">
-                                    <a href="main" class="brand-logo right"><img src="/NIT104/public/resources/img/logo.png" height="60"></a>
+                                    <a href="<?= base_url('main') ?>" class="brand-logo right"><img src="<?= base_url('resources/img/logo.png') ?>" height="60"></a>
                                     <a href="#" data-target="mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                                     <ul class="left hide-on-med-and-down">
                                         <?php if (in_array('roles.view', session('permissions'))): ?>
@@ -71,7 +71,7 @@
 
 <footer class="page-footer teal">
     <div class="container">
-        <p class="white-text">Derechos reservados 2025</p>
+        <p class="white-text">Derechos reservados 2026</p>
     </div>
 </footer>
 

@@ -354,18 +354,18 @@ class Tickets extends ResourceController
     public function delete($id = null)
     {
         try {
-            $id = $this->request->getPost('id_usuario');
+            $id = $this->request->getPost('id_ticket');
 
             if (!$id) {
                 return $this->respond(['status' => false, 'message' => 'Falta el ID'], 400);
             }
 
-            $model = new UsuarioModel();
+            $model = new TicketsModel();
             $model->delete($id);
 
             return $this->respond([
                 'status' => true,
-                'message' => 'Usuario eliminado correctamente'
+                'message' => 'Ticket eliminado correctamente'
             ]);
 
         } catch (\Throwable $th) {

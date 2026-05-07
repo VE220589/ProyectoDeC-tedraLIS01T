@@ -1,0 +1,49 @@
+services:
+  app:
+    build: .
+    container_name: tmnotes_app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      CI_ENVIRONMENT: production
+      APP_BASE_URL: http://localhost:8080/
+      DB_HOST: db
+      DB_NAME: tmnotes
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+      app.baseURL: http://localhost:8080/
+      app.sessionInactivityTimeout: 1800
+      database.default.hostname: db
+      database.default.database: tmnotes
+      database.default.username: postgres
+      database.default.password: postgres
+      database.default.port: 5432
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    ports:
+      - "8080:80"
+    volumes:
+      - app_writable:/var/www/html/writable
+
+  db:
+    image: postgres:16-alpine
+    container_name: tmnotes_db
+    environment:
+      POSTGRES_DB: tmnotes
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scriptdelabase.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tmnotes"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  app_writable:
+  postgres_data:

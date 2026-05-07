@@ -1,5 +1,5 @@
 
-<?= $this->extend('layouts/dashboard_public') ?>
+<?= $this->extend('Layouts/dashboard_public') ?>
 
 <?= $this->section('title') ?>Iniciar sesión<?= $this->endSection() ?>
 

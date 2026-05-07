@@ -1,0 +1,8 @@
+.git
+vendor
+writable/cache/*
+writable/debugbar/*
+writable/logs/*
+writable/session/*
+tests
+phpunit.xml.dist

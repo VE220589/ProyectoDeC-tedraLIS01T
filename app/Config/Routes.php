@@ -9,80 +9,82 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Dashboard::index', ['filter' => 'guest']); // Página de login (no protegida)
 $routes->get('/dashboard', 'Dashboard::index', ['filter' => 'guest']); // Página de login (no protegida)
 $routes->post('/api/auth/login', 'Auth::login'); // API de login (no protegida)
+$routes->post('/api/auth/google', 'Auth::google'); // API de login con Google (no protegida)
 $routes->get('/api/auth/exists', 'Auth::exists'); // API para verificar usuarios (no protegida)
-$routes->get('/api/auth/logOut', 'Auth::logOut'); // API de logout (puedes protegerla si quieres, pero no es necesario)
-$routes->get('/api/auth/index', 'Auth::index');
+$routes->get('/api/auth/logOut', 'Auth::logOut', ['filter' => 'auth']); // API de logout protegida
+$routes->get('/api/auth/index', 'Auth::index', ['filter' => 'auth:users.view']);
 // Rutas protegidas (requieren login)
 $routes->get('/main', 'Main::main', ['filter' => 'auth']); // Página del dashboard protegida
-$routes->get('/usuarios1', 'Usuarios1::usuarios1', ['filter' => 'auth']);
-$routes->get('/roles', 'Roles::roles', ['filter' => 'auth']);
+$routes->get('/usuarios1', 'Usuarios1::usuarios1', ['filter' => 'auth:users.view']);
+$routes->get('/roles', 'Roles::roles', ['filter' => 'auth:roles.view']);
 $routes->get('/perfil', 'Perfil::perfil', ['filter' => 'auth']);
-$routes->get('/servicios', 'Servicios::servicios', ['filter' => 'auth']);
-$routes->get('/ticket', 'Ticket::ticket', ['filter' => 'auth']);
+$routes->get('/servicios', 'Servicios::servicios', ['filter' => 'auth:services.view']);
+$routes->get('/ticket', 'Ticket::ticket', ['filter' => 'auth:tickets.view']);
 // Agrega más rutas protegidas aquí, por ejemplo:
 // $routes->get('/perfil', 'Usuario::perfil', ['filter' => 'auth']);
 
 $routes->group('api/usuarios/', ['namespace' => 'App\Controllers'], function($routes){
-    $routes->get('index', 'Usuarios::index');
-    $routes->post('readOne', 'Usuarios::readOne');
-    $routes->post('create', 'Usuarios::create');
-    $routes->post('update', 'Usuarios::update');
-    $routes->post('delete', 'Usuarios::delete');
-    $routes->post('search', 'Usuarios::search');
-    $routes->post('deletelogic', 'Usuarios::deletelogic');
-    $routes->post('updatePerfil', 'Usuarios::updatePerfil');
+    $routes->get('index', 'Usuarios::index', ['filter' => 'auth:users.view']);
+    $routes->post('readOne', 'Usuarios::readOne', ['filter' => 'auth:users.view']);
+    $routes->get('readPerfil', 'Usuarios::readPerfil', ['filter' => 'auth']);
+    $routes->post('create', 'Usuarios::create', ['filter' => 'auth:users.create']);
+    $routes->post('update', 'Usuarios::update', ['filter' => 'auth:users.update']);
+    $routes->post('delete', 'Usuarios::delete', ['filter' => 'auth:users.delete']);
+    $routes->post('search', 'Usuarios::search', ['filter' => 'auth:users.view']);
+    $routes->post('deletelogic', 'Usuarios::deletelogic', ['filter' => 'auth:users.delete']);
+    $routes->post('updatePerfil', 'Usuarios::updatePerfil', ['filter' => 'auth']);
     //$routes->get('test', 'Usuarios::test');
     // RUTAS FALTANTES
-    $routes->get('getTipo', 'Usuarios::getTipo');
-    $routes->get('getEstado', 'Usuarios::getEstado');
+    $routes->get('getTipo', 'Usuarios::getTipo', ['filter' => 'auth:users.view']);
+    $routes->get('getEstado', 'Usuarios::getEstado', ['filter' => 'auth:users.view']);
 });
 
 $routes->group('api/notas/', ['namespace' => 'App\Controllers'], function($routes){
-    $routes->post('index', 'Notas::index');
-     $routes->post('create', 'Notas::create');
-      $routes->post('createRequest', 'Notas::createRequest');
+    $routes->post('index', 'Notas::index', ['filter' => 'auth:tickets.view']);
+    $routes->post('create', 'Notas::create', ['filter' => 'auth:tickets.update']);
+    $routes->post('createRequest', 'Notas::createRequest', ['filter' => 'auth:tickets.update']);
 });
 
 $routes->group('api/tickets/', ['namespace' => 'App\Controllers'], function($routes){
-    $routes->get('index', 'Tickets::index');
-    $routes->get('supporTickets', 'Tickets::supporTickets');
-    $routes->get('userTickets', 'Tickets::userTickets');
-    $routes->post('readOne', 'Tickets::readOne');
-    $routes->post('create', 'Tickets::create');
-    $routes->post('update', 'Tickets::update');
-    $routes->post('delete', 'Tickets::delete');
-    $routes->post('search', 'Tickets::search');
-    $routes->post('deletelogic', 'Tickets::deletelogic');
-    $routes->post('updatePerfil', 'Tickets::updatePerfil');
+    $routes->get('index', 'Tickets::index', ['filter' => 'auth:tickets.view']);
+    $routes->get('supporTickets', 'Tickets::supporTickets', ['filter' => 'auth:tickets.view']);
+    $routes->get('userTickets', 'Tickets::userTickets', ['filter' => 'auth:tickets.view']);
+    $routes->post('readOne', 'Tickets::readOne', ['filter' => 'auth:tickets.view']);
+    $routes->post('create', 'Tickets::create', ['filter' => 'auth:tickets.create']);
+    $routes->post('update', 'Tickets::update', ['filter' => 'auth:tickets.update']);
+    $routes->post('delete', 'Tickets::delete', ['filter' => 'auth:tickets.delete']);
+    $routes->post('search', 'Tickets::search', ['filter' => 'auth:tickets.view']);
+    $routes->post('deletelogic', 'Tickets::deletelogic', ['filter' => 'auth:tickets.delete']);
+    $routes->post('updatePerfil', 'Tickets::updatePerfil', ['filter' => 'auth:tickets.update']);
     //$routes->get('test', 'Usuarios::test');
     // RUTAS FALTANTES
-    $routes->get('getServices', 'Tickets::getServices');
-    $routes->get('getUsuarios', 'Tickets::getUsuarios');
+    $routes->get('getServices', 'Tickets::getServices', ['filter' => 'auth:tickets.view']);
+    $routes->get('getUsuarios', 'Tickets::getUsuarios', ['filter' => 'auth:tickets.view']);
 });
 
 
 
 $routes->group('api/services/', ['namespace' => 'App\Controllers'], function($routes){
-    $routes->get('index', 'Services::index');
-    $routes->post('readOne', 'Services::readOne');
-    $routes->post('create', 'Services::create');
-    $routes->post('update', 'Services::update');
-    $routes->post('delete', 'Services::delete');
-    $routes->post('search', 'Services::search');
-    $routes->post('deletelogic', 'Services::deletelogic');
-    $routes->get('getTipo', 'Services::getTipo');
+    $routes->get('index', 'Services::index', ['filter' => 'auth:services.view']);
+    $routes->post('readOne', 'Services::readOne', ['filter' => 'auth:services.view']);
+    $routes->post('create', 'Services::create', ['filter' => 'auth:services.create']);
+    $routes->post('update', 'Services::update', ['filter' => 'auth:services.update']);
+    $routes->post('delete', 'Services::delete', ['filter' => 'auth:services.delete']);
+    $routes->post('search', 'Services::search', ['filter' => 'auth:services.view']);
+    $routes->post('deletelogic', 'Services::deletelogic', ['filter' => 'auth:services.delete']);
+    $routes->get('getTipo', 'Services::getTipo', ['filter' => 'auth:services.view']);
 });
 
 $routes->group('api/rolest/', ['namespace' => 'App\Controllers'], function($routes){
-    $routes->get('index', 'Rolest::index');
+    $routes->get('index', 'Rolest::index', ['filter' => 'auth:roles.view']);
 });
 
 
 
 
 $routes->group('api/permisos/', ['namespace' => 'App\Controllers'], function($routes){
-    $routes->post('readByRoleAndModule', 'Permisos::readByRoleAndModule');
-    $routes->post('updateByRoleAndModule', 'Permisos::updateByRoleAndModule'); 
+    $routes->post('readByRoleAndModule', 'Permisos::readByRoleAndModule', ['filter' => 'auth:roles.view']);
+    $routes->post('updateByRoleAndModule', 'Permisos::updateByRoleAndModule', ['filter' => 'auth:roles.update']); 
 });
 
 

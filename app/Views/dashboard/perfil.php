@@ -1,4 +1,4 @@
-<?= $this->extend('layouts/dashboard_public') ?>
+<?= $this->extend('Layouts/dashboard_public') ?>
 
 <?= $this->section('title') ?>Gestión del perfil<?= $this->endSection() ?>
 
@@ -75,7 +75,7 @@
 
 <?= $this->section('scripts') ?>
 <script src="<?= base_url('js/dashboard/main.js') ?>"></script>
-<script src="<?= base_url('js/dashboard/perfil.js') ?>"></script>
+<script src="<?= base_url('js/dashboard/perfil.js?v=' . filemtime(FCPATH . 'js/dashboard/perfil.js')) ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const tipoUsuario = "<?= session()->get('tipo_usuario') ?>";

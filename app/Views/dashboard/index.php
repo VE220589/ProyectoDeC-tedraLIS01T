@@ -1,4 +1,4 @@
-<?= $this->extend('layouts/dashboard_main') ?>
+<?= $this->extend('Layouts/dashboard_main') ?>
 
 <?= $this->section('title') ?>Iniciar sesión<?= $this->endSection() ?>
 
@@ -36,11 +36,11 @@
             <div class="card login-card z-depth-3 white">
 
                 <!-- Logo -->
-                <img src="/NIT104/public/resources/img/logo.png" height="80" class="brand-logo-login">
+                <img src="<?= base_url('resources/img/logo.png') ?>" height="80" class="brand-logo-login">
 
                 <h5 class="center-align">Bienvenido</h5>
 
-                <form method="post" id="session-form">
+                <form method="post" id="session-form" action="<?= base_url('api/auth/login') ?>">
 
                     <div class="input-field">
                         <i class="material-icons prefix">person</i>
@@ -61,6 +61,12 @@
                     </div>
                 </form>
 
+                <?php if (env('GOOGLE_CLIENT_ID')): ?>
+                    <div class="center-align" style="margin-top: 18px;">
+                        <div id="google-login"></div>
+                    </div>
+                <?php endif; ?>
+
             </div>
         </div>
     </div>
@@ -77,6 +83,10 @@
 <script>
     const BASE_URL = "<?= base_url('dashboard') ?>";
     const API_AUTH = "<?= base_url('api/auth/') ?>";
+    const GOOGLE_CLIENT_ID = "<?= esc(env('GOOGLE_CLIENT_ID') ?? '') ?>";
 </script>
+<?php if (env('GOOGLE_CLIENT_ID')): ?>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<?php endif; ?>
 <?= $this->endSection() ?>
 

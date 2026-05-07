@@ -1,4 +1,4 @@
-<?= $this->extend('layouts/dashboard_public') ?>
+<?= $this->extend('Layouts/dashboard_public') ?>
 
 <?= $this->section('title') ?>Gestión de roles<?= $this->endSection() ?>
 

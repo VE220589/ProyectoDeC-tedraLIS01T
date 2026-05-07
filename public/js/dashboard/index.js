@@ -64,7 +64,7 @@ document.getElementById('session-form').addEventListener('submit', e => {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error al iniciar sesión',
-                    text: response.exception
+                    text: response.message || response.exception || 'Revise sus credenciales e intente nuevamente'
                 });
             }
         })
@@ -72,4 +72,54 @@ document.getElementById('session-form').addEventListener('submit', e => {
             console.error(error);
             Swal.fire("Error", "No se pudo procesar la solicitud", "error");
         });
+});
+
+window.handleGoogleCredential = response => {
+    const body = new FormData();
+    body.append('credential', response.credential);
+
+    fetch(API_AUTH + 'google', {
+        method: 'POST',
+        body
+    })
+        .then(r => r.json())
+        .then(payload => {
+            if (payload.status) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Bienvenido',
+                    text: payload.message
+                }).then(() => {
+                    window.location.href = URL_MAIN;
+                });
+                return;
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'No se pudo iniciar con Google',
+                text: payload.message || 'Intente nuevamente o use usuario y contrasena'
+            });
+        })
+        .catch(error => {
+            console.error(error);
+            Swal.fire('Error', 'No se pudo validar la cuenta de Google', 'error');
+        });
+};
+
+window.addEventListener('load', () => {
+    if (!window.google || !GOOGLE_CLIENT_ID || !document.getElementById('google-login')) {
+        return;
+    }
+
+    google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredential
+    });
+    google.accounts.id.renderButton(document.getElementById('google-login'), {
+        theme: 'outline',
+        size: 'large',
+        width: 320,
+        text: 'signin_with'
+    });
 });

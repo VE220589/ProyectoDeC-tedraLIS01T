@@ -58,6 +58,31 @@ class Usuarios extends ResourceController
         }
     }
 
+    public function readPerfil()
+    {
+        try {
+            $id = session()->get('id_usuario');
+
+            if (!$id) {
+                return $this->respond(['status' => false, 'message' => 'Sesion no valida'], 401);
+            }
+
+            $model = new UsuarioModel();
+            $data = $model->find($id);
+
+            if (!$data) {
+                return $this->respond(['status' => false, 'message' => 'Usuario no encontrado'], 404);
+            }
+
+            unset($data['password_hash']);
+
+            return $this->respond(['status' => true, 'dataset' => $data]);
+
+        } catch (\Throwable $th) {
+            return $this->respond(['status' => false, 'exception' => $th->getMessage()], 500);
+        }
+    }
+
     // =========================================
     // CREAR USUARIO
     // =========================================
@@ -189,12 +214,21 @@ class Usuarios extends ResourceController
             return $this->respond(['status' => false, 'message' => 'Usuario no encontrado'], 404);
         }
 
+        if ((int) session()->get('id_usuario') !== (int) $id) {
+            return $this->respond([
+                'status' => false,
+                'message' => 'No puede modificar el perfil de otro usuario'
+            ], 403);
+        }
+
         // ============================================================
         // VALIDAR CONTRASEÑA ACTUAL
         // ============================================================
         $claveActual = $this->request->getPost('clave_actual');
+        $claveNueva = $this->request->getPost('clave_usuario');
+        $isGoogleUser = session()->get('auth_provider') === 'google';
 
-        if (!$claveActual || !password_verify($claveActual, $usuarioActual['password_hash'])) {
+        if (!$isGoogleUser && $claveNueva && (!$claveActual || !password_verify($claveActual, $usuarioActual['password_hash']))) {
             return $this->respond([
                 'status' => false,
                 'message' => 'La contraseña actual es incorrecta'
@@ -233,7 +267,6 @@ class Usuarios extends ResourceController
         // ============================================================
         // SI VIENE CONTRASEÑA NUEVA → ACTUALIZARLA
         // ============================================================
-        $claveNueva = $this->request->getPost('clave_usuario');
         $confirmarClave = $this->request->getPost('confirmar_clave');
 
         if ($claveNueva) {

@@ -98,6 +98,17 @@ CREATE INDEX idx_tickets_priority ON tickets(priority);
 CREATE INDEX idx_tickets_service ON tickets(service_id);
 CREATE INDEX idx_tickets_ticket_number ON tickets(ticket_number);
 
+-- Sesiones persistentes compatibles con CodeIgniter si se cambia a DatabaseHandler.
+CREATE TABLE ci_sessions (
+  id VARCHAR(128) NOT NULL,
+  ip_address VARCHAR(45) NOT NULL,
+  timestamp INT DEFAULT 0 NOT NULL,
+  data BYTEA NOT NULL,
+  PRIMARY KEY (id, ip_address)
+);
+
+CREATE INDEX idx_ci_sessions_timestamp ON ci_sessions(timestamp);
+
 -- --------------------------------------------------------------------------------
 
 -- Seed
@@ -133,6 +144,22 @@ SELECT r.id, p.id, FALSE
 FROM roles r
 CROSS JOIN permissions p
 WHERE r.name <> 'admin';
+
+UPDATE role_permissions rp
+SET status = TRUE
+FROM roles r, permissions p
+WHERE rp.role_id = r.id
+  AND rp.permission_id = p.id
+  AND r.name = 'support'
+  AND p.name IN ('tickets.view', 'tickets.update', 'services.view');
+
+UPDATE role_permissions rp
+SET status = TRUE
+FROM roles r, permissions p
+WHERE rp.role_id = r.id
+  AND rp.permission_id = p.id
+  AND r.name = 'end_user'
+  AND p.name IN ('tickets.view', 'tickets.create', 'tickets.update', 'services.view');
 
 INSERT INTO services_classification (name, description) VALUES
   ('infrastructure', 'Servicios ajustados a infraestructura'),

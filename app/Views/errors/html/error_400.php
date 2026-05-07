@@ -1,84 +1,156 @@
+<?php
+$homeUrl = function_exists('base_url') ? base_url('/') : '/';
+$loginUrl = function_exists('base_url') ? base_url('dashboard') : '/dashboard';
+$logoUrl = function_exists('base_url') ? base_url('resources/img/logo.png') : '/resources/img/logo.png';
+$detail = ENVIRONMENT !== 'production' && ! empty($message) ? $message : 'La solicitud no pudo procesarse correctamente.';
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8">
-    <title><?= lang('Errors.badRequest') ?></title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud no valida</title>
     <style>
-        div.logo {
-            height: 200px;
-            width: 155px;
-            display: inline-block;
-            opacity: 0.08;
-            position: absolute;
-            top: 2rem;
-            left: 50%;
-            margin-left: -73px;
+        :root {
+            --teal: #00695c;
+            --blue: #1565c0;
+            --surface: #ffffff;
+            --text: #1f2933;
+            --muted: #607d8b;
+            --border: #d8e2e0;
+            --page: #f4f8f7;
         }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            height: 100%;
-            background: #fafafa;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            color: #777;
-            font-weight: 300;
+            margin: 0;
+            min-height: 100vh;
+            background: var(--page);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+            display: flex;
+            flex-direction: column;
         }
-        h1 {
-            font-weight: lighter;
-            letter-spacing: normal;
-            font-size: 3rem;
-            margin-top: 0;
-            margin-bottom: 0;
-            color: #222;
+
+        header,
+        footer {
+            background: var(--teal);
+            color: #fff;
         }
-        .wrap {
-            max-width: 1024px;
-            margin: 5rem auto;
-            padding: 2rem;
-            background: #fff;
+
+        header {
+            height: 78px;
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .brand img {
+            height: 52px;
+            width: auto;
+        }
+
+        main {
+            flex: 1;
+            display: grid;
+            place-items: center;
+            padding: 48px 20px;
+        }
+
+        .panel {
+            width: min(920px, 100%);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 16px 38px rgba(0, 77, 64, .10);
+            padding: 46px;
             text-align: center;
-            border: 1px solid #efefef;
-            border-radius: 0.5rem;
-            position: relative;
         }
-        pre {
-            white-space: normal;
-            margin-top: 1.5rem;
+
+        .code {
+            color: var(--teal);
+            font-size: 88px;
+            line-height: 1;
+            font-weight: 700;
+            margin: 0 0 14px;
         }
-        code {
-            background: #fafafa;
-            border: 1px solid #efefef;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            display: block;
+
+        h1 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
         }
+
         p {
-            margin-top: 1.5rem;
+            max-width: 620px;
+            margin: 18px auto 0;
+            color: var(--muted);
+            font-size: 18px;
+            line-height: 1.5;
         }
-        .footer {
-            margin-top: 2rem;
-            border-top: 1px solid #efefef;
-            padding: 1em 2em 0 2em;
-            font-size: 85%;
-            color: #999;
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 30px;
         }
-        a:active,
-        a:link,
-        a:visited {
-            color: #dd4814;
+
+        .btn {
+            border: 0;
+            border-radius: 6px;
+            padding: 12px 18px;
+            min-width: 150px;
+            color: #fff;
+            background: var(--teal);
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .btn.secondary {
+            background: var(--blue);
+        }
+
+        footer {
+            padding: 18px 28px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-<div class="wrap">
-    <h1>400</h1>
+    <header>
+        <div class="brand">
+            <img src="<?= esc($logoUrl, 'attr') ?>" alt="Logo">
+            <span>Portal de soporte</span>
+        </div>
+    </header>
 
-    <p>
-        <?php if (ENVIRONMENT !== 'production') : ?>
-            <?= nl2br(esc($message)) ?>
-        <?php else : ?>
-            <?= lang('Errors.sorryBadRequest') ?>
-        <?php endif; ?>
-    </p>
-</div>
+    <main>
+        <section class="panel" aria-labelledby="page-title">
+            <div class="code">400</div>
+            <h1 id="page-title">Solicitud no valida</h1>
+            <p><?= esc($detail) ?></p>
+            <div class="actions">
+                <a class="btn" href="<?= esc($loginUrl, 'attr') ?>">Ir al inicio</a>
+                <a class="btn secondary" href="<?= esc($homeUrl, 'attr') ?>">Volver al portal</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>Derechos reservados <?= date('Y') ?></footer>
 </body>
 </html>

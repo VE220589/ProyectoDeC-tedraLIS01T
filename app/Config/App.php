@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'http://localhost/nit104/public/';
+    public string $baseURL = 'http://localhost/ProyectoDeC-tedraLIS01T/public/';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
@@ -199,4 +199,12 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->baseURL = getenv('APP_BASE_URL')
+            ?: env('app.baseURL', 'http://localhost/ProyectoDeC-tedraLIS01T/public/');
+    }
 }
