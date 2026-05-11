@@ -24,8 +24,8 @@
     <div class="modal-content">
         <h4 id="modal-title" class="center-align">Visualización de permisos</h4>
         <form method="post" id="save-form">    
-            <input class="hide" type="text" id="id_rol" name="id_rol"/>
-            <input  type="text" id="modulo" name="modulo"/>
+            <input class="hide" type="text" id="id_rol" name="id_rol" readonly/>
+            <input class="hide" type="text" id="modulo" name="modulo" readonly/>
                 <div class="row center-align">
                     <div class="switch">
                         <b>Crear</b>
@@ -72,7 +72,7 @@
 
 <?= $this->section('scripts') ?>
 <script src="<?= base_url('js/dashboard/main.js') ?>"></script>
-<script src="<?= base_url('js/dashboard/roles.js') ?>"></script>
+<script src="<?= base_url('js/dashboard/roles.js?v=' . filemtime(FCPATH . 'js/dashboard/roles.js')) ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const tipoUsuario = "<?= session()->get('tipo_usuario') ?>";

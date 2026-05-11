@@ -44,6 +44,86 @@ function cargarCombo(endpoint, selectId, idField, textField) {
         .catch(err => console.error("Error cargando combo:", err));
 }
 
+function formatApiError(json, fallback = "Ocurrio un error desconocido") {
+    if (json && json.errors && typeof json.errors === 'object') {
+        return Object.values(json.errors).join('\n');
+    }
+
+    return (json && (json.message || json.exception || json.error_db || json.error)) || fallback;
+}
+
+const TICKET_TYPES = ['incident', 'problem', 'change'];
+const TICKET_PRIORITIES = ['C', 'B', 'A', 'S'];
+const TICKET_STATUSES = ['open', 'in_progress', 'mitigated', 'closed'];
+
+function showValidationError(message, fieldId) {
+    Swal.fire("Revise el formulario", message, "warning").then(() => {
+        document.getElementById(fieldId)?.focus();
+    });
+
+    return false;
+}
+
+function isPositiveInteger(value) {
+    return /^[1-9]\d*$/.test(String(value || ''));
+}
+
+function validateTicketForm(form, isUpdate) {
+    const titulo = String(form.get('title') || '').trim();
+    const descripcion = String(form.get('desc') || '').trim();
+    const tipo = String(form.get('id_tipo_ticket') || '');
+    const prioridad = String(form.get('prioridad') || '');
+    const servicio = String(form.get('id_servicio') || '');
+    const estado = String(form.get('estado') || '');
+    const asignado = String(form.get('id_asignado') || '');
+    const asignadoVisible = window.getComputedStyle(document.getElementById('usuarios_container')).display !== 'none';
+
+    if (titulo.length < 5 || titulo.length > 255) {
+        return showValidationError("El titulo debe tener de 5 a 255 caracteres.", "title");
+    }
+
+    if (descripcion.length < 10) {
+        return showValidationError("La descripcion debe explicar el problema con al menos 10 caracteres.", "desc");
+    }
+
+    if (!TICKET_TYPES.includes(tipo)) {
+        return showValidationError("Seleccione un tipo de ticket valido.", "id_tipo_ticket");
+    }
+
+    if (!TICKET_PRIORITIES.includes(prioridad)) {
+        return showValidationError("Seleccione una prioridad valida.", "prioridad");
+    }
+
+    if (!isPositiveInteger(servicio)) {
+        return showValidationError("Seleccione un servicio valido.", "id_servicio");
+    }
+
+    if (isUpdate && !TICKET_STATUSES.includes(estado)) {
+        return showValidationError("Seleccione un estado valido.", "estado");
+    }
+
+    if (asignadoVisible && !isPositiveInteger(asignado)) {
+        return showValidationError("Seleccione un tecnico valido para asignar el ticket.", "id_asignado");
+    }
+
+    return true;
+}
+
+function validateNoteForm(form) {
+    const ticketId = String(form.get('id_ticketnota') || '');
+    const nota = String(form.get('descnote') || '').trim();
+
+    if (!isPositiveInteger(ticketId)) {
+        return showValidationError("No se encontro el ticket para guardar la nota.", "id_ticketnota");
+    }
+
+    if (nota.length < 3 || nota.length > 100) {
+        return showValidationError("La nota debe tener de 3 a 100 caracteres.", "descnote");
+    }
+
+    return true;
+}
+
 
 
 // ===============================
@@ -76,7 +156,7 @@ function cargarInfo(action){
                     //window.location.href = MAIN_URL;
                 }
             } else {
-                Swal.fire("Error", json.exception, "error");
+                Swal.fire("Error", formatApiError(json, "No se pudo cargar tickets"), "error");
             }
         })
         .catch(() => Swal.fire("Error", "No se pudo cargar la tabla", "error"));
@@ -383,7 +463,7 @@ function cargarNotas(id) {
                 Swal.fire("Sin datos", "No se encontraron notas asignadas al ticket", "info");
             }
         } else {
-            Swal.fire("Error", json.exception, "error");
+            Swal.fire("Error", formatApiError(json, "No se pudieron cargar notas"), "error");
         }
     })
     .catch(() => Swal.fire("Error", "No se pudo cargar la tabla", "error"));
@@ -448,7 +528,7 @@ window.openUpdateDialog = function (id) {
     })
     .then(res => res.json())
     .then(json => {
-        if (!json.status) return Swal.fire("Error", json.exception, "error");
+        if (!json.status) return Swal.fire("Error", formatApiError(json, "No se pudo leer el ticket"), "error");
 
         const d = json.dataset;
 
@@ -538,6 +618,10 @@ document.getElementById('save-form').addEventListener('submit', e => {
     const isUpdate = form.get('id_ticket') !== '';
     const action = isUpdate ? 'update' : 'create';
 
+    if (!validateTicketForm(form, isUpdate)) {
+        return;
+    }
+
     fetch(API_TICKETS + action, {
         method: 'POST',
         body: form
@@ -547,14 +631,7 @@ document.getElementById('save-form').addEventListener('submit', e => {
         console.log(json);
 
         if (!json.status) {
-            let errorMessage = 
-                json.exception ||
-                json.error_db ||
-                JSON.stringify(json.errors) ||
-                json.message ||
-                "Ocurrió un error desconocido";
-
-            Swal.fire("Error", errorMessage, "error");
+            Swal.fire("Error", formatApiError(json), "error");
             return;
         }
 
@@ -570,6 +647,11 @@ document.getElementById('saveview-form').addEventListener('submit', e => {
     e.preventDefault();
 
     const form = new FormData(e.target);
+
+    if (!validateNoteForm(form)) {
+        return;
+    }
+
     fetch(API_NOTAS + 'create', {
         method: 'POST',
         body: form
@@ -579,14 +661,7 @@ document.getElementById('saveview-form').addEventListener('submit', e => {
         console.log(json);
 
         if (!json.status) {
-            let errorMessage = 
-                json.exception ||
-                json.error_db ||
-                JSON.stringify(json.errors) ||
-                json.message ||
-                "Ocurrió un error desconocido";
-
-            Swal.fire("Error", errorMessage, "error");
+            Swal.fire("Error", formatApiError(json), "error");
             return;
         }
 
@@ -630,7 +705,7 @@ window.openDeleteDialog = function (id) {
                 .then(res => res.json())
                 .then(json => {
                     console.log(json);
-                    if (!json.status) return Swal.fire("Error", json.exception, "error");
+                    if (!json.status) return Swal.fire("Error", formatApiError(json, "No se pudo cerrar el ticket"), "error");
 
                     Swal.fire("Cerrado", "Ticket cerrado correctamente", "success");
                     cargarTickets();
@@ -661,7 +736,7 @@ window.openRequestDialog = function (id) {
                 .then(res => res.json())
                 .then(json => {
                     console.log(json);
-                    if (!json.status) return Swal.fire("Error", json.exception, "error");
+                    if (!json.status) return Swal.fire("Error", formatApiError(json, "No se pudo solicitar el cierre"), "error");
 
                     Swal.fire("Solicitado", "Ticket se ha solicitado para su cierre", "success");
                     cargarTickets();

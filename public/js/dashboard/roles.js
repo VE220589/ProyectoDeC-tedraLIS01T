@@ -4,6 +4,39 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarRoles();
 });
 
+function formatApiError(json, fallback = "Ocurrio un error desconocido") {
+    if (json && json.errors && typeof json.errors === 'object') {
+        return Object.values(json.errors).join('\n');
+    }
+
+    return (json && (json.message || json.exception || json.error_db || json.error)) || fallback;
+}
+
+const PERMISSION_MODULES = ['users', 'roles', 'services', 'tickets'];
+
+function showValidationError(message, fieldId) {
+    Swal.fire("Revise el formulario", message, "warning").then(() => {
+        document.getElementById(fieldId)?.focus();
+    });
+
+    return false;
+}
+
+function validatePermissionsForm(form) {
+    const roleId = String(form.get('role_id') || '');
+    const modulo = String(form.get('modulo') || '');
+
+    if (!/^[1-9]\d*$/.test(roleId)) {
+        return showValidationError("Seleccione un rol valido.", "id_rol");
+    }
+
+    if (!PERMISSION_MODULES.includes(modulo)) {
+        return showValidationError("Seleccione un modulo valido.", "modulo");
+    }
+
+    return true;
+}
+
 function cargarRoles() {
     fetch(API_ROLES + 'index')
         .then(res => res.json())
@@ -18,7 +51,7 @@ function cargarRoles() {
                     Swal.fire("Sin datos", "No se encontraron roles.", "info");
                 }
             } else {
-                Swal.fire("Error", json.exception, "error");
+                Swal.fire("Error", formatApiError(json, "No se pudieron cargar roles"), "error");
             }
         })
         .catch(() => Swal.fire("Error", "No se pudo cargar la tabla", "error"));
@@ -74,7 +107,7 @@ window.openUpdateDialog = function (id, moduleName) {
         console.log(json);
 
         if (!json.status) {
-            return Swal.fire("Error", json.exception, "error");
+            return Swal.fire("Error", formatApiError(json, "No se pudieron cargar permisos"), "error");
         }
 
         const permisos = json.dataset;
@@ -132,6 +165,10 @@ function savePermisos() {
     form.append('delete', document.getElementById('delete').checked ? "1" : "0");
     form.append('view',   document.getElementById('show').checked ? "1" : "0");
 
+    if (!validatePermissionsForm(form)) {
+        return;
+    }
+
     fetch(API_PERMI + 'updateByRoleAndModule', {
         method: 'POST',
         body: form
@@ -150,7 +187,7 @@ function savePermisos() {
              M.Modal.getInstance(document.getElementById('save-modal')).close();
             cargarRoles();
         } else {
-            Swal.fire("Error", json.message, "error");
+            Swal.fire("Error", formatApiError(json, "No se pudieron actualizar permisos"), "error");
         }
     })
     .catch(err => {

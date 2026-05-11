@@ -38,7 +38,7 @@
             <div class="row">
                 <div class="input-field col s12 m6">
                     <i class="material-icons prefix">assignment</i>
-                    <input id="desc" type="text" name="desc" class="validate" required/>
+                    <input id="desc" type="text" name="desc" class="validate" minlength="3" maxlength="50" required/>
                     <label for="desc">Servicio</label>
                 </div>
 
@@ -73,7 +73,7 @@
     const USER_PERMISSIONS = <?= json_encode(session('permissions')); ?>;
 </script>
 <script src="<?= base_url('js/dashboard/main.js') ?>"></script>
-<script src="<?= base_url('js/dashboard/servicios.js') ?>"></script>
+<script src="<?= base_url('js/dashboard/servicios.js?v=' . filemtime(FCPATH . 'js/dashboard/servicios.js')) ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const tipoUsuario = "<?= session()->get('tipo_usuario') ?>";

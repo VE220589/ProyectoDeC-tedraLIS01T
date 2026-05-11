@@ -39,14 +39,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 });
 
+function showValidationError(message, fieldId) {
+    Swal.fire('Revise el formulario', message, 'warning').then(() => {
+        document.getElementById(fieldId)?.focus();
+    });
+
+    return false;
+}
+
+function validateLoginForm(form) {
+    const alias = String(form.get('alias_usuario') || '').trim();
+    const clave = String(form.get('clave_usuario') || '');
+
+    if (!/^[A-Za-z0-9]{3,25}$/.test(alias)) {
+        return showValidationError('El alias debe tener de 3 a 25 caracteres y solo puede usar letras o numeros.', 'alias');
+    }
+
+    if (!clave || clave.length > 72) {
+        return showValidationError('Ingrese una contrasena valida.', 'clave');
+    }
+
+    return true;
+}
 
 // Login local: envia alias y contrasena al endpoint PHP.
 document.getElementById('session-form').addEventListener('submit', e => {
     e.preventDefault();
+    const form = new FormData(e.target);
+
+    if (!validateLoginForm(form)) {
+        return;
+    }
 
     fetch(API_AUTH + 'login', {
         method: 'POST',
-        body: new FormData(e.target)
+        body: form
     })
         .then(r => r.json())
         .then(response => {

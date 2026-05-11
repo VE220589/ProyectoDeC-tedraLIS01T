@@ -79,13 +79,13 @@
 
                     <div class="input-field">
                         <i class="material-icons prefix">person</i>
-                        <input id="alias" type="text" name="alias_usuario" required />
+                        <input id="alias" type="text" name="alias_usuario" minlength="3" maxlength="25" pattern="[A-Za-z0-9]{3,25}" required />
                         <label for="alias">Alias</label>
                     </div>
 
                     <div class="input-field">
                         <i class="material-icons prefix">lock</i>
-                        <input id="clave" type="password" name="clave_usuario" required />
+                        <input id="clave" type="password" name="clave_usuario" maxlength="72" required />
                         <label for="clave">Contraseña</label>
                     </div>
 

@@ -58,7 +58,6 @@ $routes->group('api/tickets/', ['namespace' => 'App\Controllers'], function ($ro
     $routes->post('delete', 'Tickets::delete', ['filter' => 'auth:tickets.delete']);
     $routes->post('search', 'Tickets::search', ['filter' => 'auth:tickets.view']);
     $routes->post('deletelogic', 'Tickets::deletelogic', ['filter' => 'auth:tickets.delete']);
-    $routes->post('updatePerfil', 'Tickets::updatePerfil', ['filter' => 'auth:tickets.update']);
     $routes->get('getServices', 'Tickets::getServices', ['filter' => 'auth:tickets.view']);
     $routes->get('getUsuarios', 'Tickets::getUsuarios', ['filter' => 'auth:tickets.view']);
 });

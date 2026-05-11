@@ -60,12 +60,21 @@ class Auth extends ResourceController
             // Acepta credenciales enviadas como formulario tradicional o como JSON.
             $alias = $this->request->getPost('alias_usuario') ?? $this->request->getJSONVar('alias_usuario');
             $clave = $this->request->getPost('clave_usuario') ?? $this->request->getJSONVar('clave_usuario');
+            $alias = trim((string) $alias);
+            $clave = (string) $clave;
 
             if (! $alias || ! $clave) {
                 return $this->respond([
                     'status' => false,
                     'message' => 'Ingrese usuario y contrasena para continuar.',
                 ], 400);
+            }
+
+            if (! preg_match('/^[A-Za-z0-9]{3,25}$/', $alias) || strlen($clave) > 72) {
+                return $this->respond([
+                    'status' => false,
+                    'message' => 'Revise el formato del usuario o la contrasena.',
+                ], 422);
             }
 
             $model = new UsuarioModel();
@@ -113,12 +122,20 @@ class Auth extends ResourceController
                 ?? $this->request->getPost('id_token')
                 ?? $this->request->getJSONVar('credential')
                 ?? $this->request->getJSONVar('id_token');
+            $credential = trim((string) $credential);
 
             if (! $credential) {
                 return $this->respond([
                     'status' => false,
                     'message' => 'No se recibio la credencial de Google.',
                 ], 400);
+            }
+
+            if (strlen($credential) > 4096) {
+                return $this->respond([
+                    'status' => false,
+                    'message' => 'La credencial de Google no tiene un formato valido.',
+                ], 422);
             }
 
             $profile = $this->verifyGoogleCredential($credential);

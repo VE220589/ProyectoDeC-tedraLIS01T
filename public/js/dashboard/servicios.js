@@ -41,6 +41,37 @@ function cargarCombo(endpoint, selectId, idField, textField) {
         .catch(err => console.error("Error cargando combo:", err));
 }
 
+function formatApiError(json, fallback = "Ocurrio un error desconocido") {
+    if (json && json.errors && typeof json.errors === 'object') {
+        return Object.values(json.errors).join('\n');
+    }
+
+    return (json && (json.message || json.exception || json.error_db || json.error)) || fallback;
+}
+
+function showValidationError(message, fieldId) {
+    Swal.fire("Revise el formulario", message, "warning").then(() => {
+        document.getElementById(fieldId)?.focus();
+    });
+
+    return false;
+}
+
+function validateServiceForm(form) {
+    const descripcion = String(form.get('desc') || '').trim();
+    const tipo = String(form.get('id_tipo') || '');
+
+    if (descripcion.length < 3 || descripcion.length > 50) {
+        return showValidationError("El servicio debe tener de 3 a 50 caracteres.", "desc");
+    }
+
+    if (!tipo || Number.isNaN(Number(tipo))) {
+        return showValidationError("Seleccione una clasificacion valida.", "id_tipo_servicio");
+    }
+
+    return true;
+}
+
 
 
 // ===============================
@@ -61,7 +92,7 @@ function cargarServicios() {
                     Swal.fire("Sin datos", "No se encontraron usuarios.", "info");
                 }
             } else {
-                Swal.fire("Error", json.exception, "error");
+                Swal.fire("Error", formatApiError(json, "No se pudo cargar servicios"), "error");
             }
         })
         .catch(() => Swal.fire("Error", "No se pudo cargar la tabla", "error"));
@@ -159,7 +190,7 @@ window.openUpdateDialog = function (id) {
     .then(res => res.json())
     .then(json => {
         console.log(json); // Ver respuesta en consola
-        if (!json.status) return Swal.fire("Error", json.exception, "error");
+        if (!json.status) return Swal.fire("Error", formatApiError(json, "No se pudo leer el servicio"), "error");
 
         const d = json.dataset;
 
@@ -193,6 +224,10 @@ document.getElementById('save-form').addEventListener('submit', e => {
     const isUpdate = form.get('id_servicio') !== '';
     const action = isUpdate ? 'update' : 'create';
 
+    if (!validateServiceForm(form)) {
+        return;
+    }
+
     fetch(API_SERVICIOS + action, {
         method: 'POST',
         body: form
@@ -201,14 +236,7 @@ document.getElementById('save-form').addEventListener('submit', e => {
     .then(json => {
         console.log(json);//Para ver la respuesta del json en la consola
         if (!json.status) {
-            let errorMessage = 
-                json.exception ||
-                json.error_db ||
-                JSON.stringify(json.errors) ||
-                json.message ||
-                "Ocurrió un error desconocido";
-
-            Swal.fire("Error", errorMessage, "error");
+            Swal.fire("Error", formatApiError(json), "error");
             return;
         }
 
@@ -246,7 +274,7 @@ window.openDeleteDialog = function (id) {
                 .then(res => res.json())
                 .then(json => {
                     console.log(json);
-                    if (!json.status) return Swal.fire("Error", json.exception, "error");
+                    if (!json.status) return Swal.fire("Error", formatApiError(json, "No se pudo dar de baja el servicio"), "error");
 
                     Swal.fire("Elominado", "El servicio ha sido eliminado correctamente", "success");
                     cargarServicios();

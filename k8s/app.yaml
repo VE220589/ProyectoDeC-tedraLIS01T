@@ -6,8 +6,8 @@ metadata:
 data:
   # Configuracion no sensible de la aplicacion.
   CI_ENVIRONMENT: production
-  APP_BASE_URL: http://localhost/
-  app.baseURL: http://localhost/
+  APP_BASE_URL: http://localhost:30080/
+  app.baseURL: http://localhost:30080/
   app.sessionInactivityTimeout: "1800"
   DB_HOST: postgres
   DB_NAME: tmnotes
@@ -35,6 +35,19 @@ spec:
       labels:
         app: tmnotes-app
     spec:
+      initContainers:
+        - name: prepare-writable
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - >
+              mkdir -p /writable/cache /writable/debugbar /writable/logs /writable/session /writable/uploads
+              && chown -R 33:33 /writable
+              && chmod -R 775 /writable
+          volumeMounts:
+            - name: writable
+              mountPath: /writable
       containers:
         - name: app
           # Imagen local construida con: docker build -t tmnotes-app:latest .

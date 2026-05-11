@@ -50,13 +50,13 @@
             <div class="row">
                 <div class="input-field col s12 m6" id="titlecontainer">
                     <i class="material-icons prefix">list_alt</i>
-                    <input id="title" type="text" name="title" class="validate" required/>
+                    <input id="title" type="text" name="title" class="validate" minlength="5" maxlength="255" required/>
                     <label for="title">Titulo</label>
                 </div>
 
                 <div class="input-field col s12 m6" id="desccontainer">
                     <i class="material-icons prefix">description</i>
-                    <input id="desc" type="text" name="desc" class="validate" required/>
+                    <input id="desc" type="text" name="desc" class="validate" minlength="10" required/>
                     <label for="desc">Descripción</label>
                 </div>
 
@@ -142,7 +142,7 @@
                 <div id="createnote">
                     <div class="input-field col s12 m6">
                     <i class="material-icons prefix">description</i>
-                    <input id="descnote" type="text" name="descnote" class="validate" required/>
+                    <input id="descnote" type="text" name="descnote" class="validate" minlength="3" maxlength="100" required/>
                     <label for="descnote">Descripción de la nota</label>
                     </div>
                     <div class="input-field col s12 m6">
@@ -186,7 +186,7 @@
 
 <?= $this->section('scripts') ?>
 <script src="<?= base_url('js/dashboard/main.js') ?>"></script>
-<script src="<?= base_url('js/dashboard/tickets.js') ?>"></script>
+<script src="<?= base_url('js/dashboard/tickets.js?v=' . filemtime(FCPATH . 'js/dashboard/tickets.js')) ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const tipoUsuario = "<?= session()->get('tipo_usuario') ?>";

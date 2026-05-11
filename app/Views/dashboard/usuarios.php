@@ -42,37 +42,37 @@
             <div class="row">
                 <div class="input-field col s12 m6">
                     <i class="material-icons prefix">person</i>
-                    <input id="nombres_usuario" type="text" name="nombres_usuario" class="validate" required/>
+                    <input id="nombres_usuario" type="text" name="nombres_usuario" class="validate" minlength="2" maxlength="30" required/>
                     <label for="nombres_usuario">Nombres</label>
                 </div>
 
                 <div class="input-field col s12 m6">
                     <i class="material-icons prefix">person</i>
-                    <input id="apellidos_usuario" type="text" name="apellidos_usuario" class="validate" required/>
+                    <input id="apellidos_usuario" type="text" name="apellidos_usuario" class="validate" minlength="2" maxlength="30" required/>
                     <label for="apellidos_usuario">Apellidos</label>
                 </div>
 
                 <div class="input-field col s12 m6">
                     <i class="material-icons prefix">email</i>
-                    <input id="correo_usuario" type="email" name="correo_usuario" class="validate" required/>
+                    <input id="correo_usuario" type="email" name="correo_usuario" class="validate" maxlength="100" required/>
                     <label for="correo_usuario">Correo</label>
                 </div>
 
                 <div class="input-field col s12 m6">
                     <i class="material-icons prefix">person_pin</i>
-                    <input id="alias_usuario" type="text" name="alias_usuario" class="validate" readonly/>
+                    <input id="alias_usuario" type="text" name="alias_usuario" class="validate" minlength="3" maxlength="25" pattern="[A-Za-z0-9]{3,25}" readonly/>
                     <label for="alias_usuario">Alias</label>
                 </div>
 
                 <div class="input-field col s12 m6">
                     <i class="material-icons prefix">security</i>
-                    <input id="clave_usuario" type="password" name="clave_usuario" class="validate" required/>
+                    <input id="clave_usuario" type="password" name="clave_usuario" class="validate" minlength="8" maxlength="72" pattern="(?=.*[A-Za-z])(?=.*\d).{8,72}" required/>
                     <label for="clave_usuario">Clave</label>
                 </div>
 
                 <div class="input-field col s12 m6">
                     <i class="material-icons prefix">security</i>
-                    <input id="confirmar_clave" type="password" name="confirmar_clave" class="validate" required/>
+                    <input id="confirmar_clave" type="password" name="confirmar_clave" class="validate" minlength="8" maxlength="72" required/>
                     <label for="confirmar_clave">Confirmar clave</label>
                 </div>
 
@@ -107,7 +107,7 @@
     const USER_PERMISSIONS = <?= json_encode(session('permissions')); ?>;
 </script>
 <script src="<?= base_url('js/dashboard/main.js') ?>"></script>
-<script src="<?= base_url('js/dashboard/usuarios.js') ?>"></script>
+<script src="<?= base_url('js/dashboard/usuarios.js?v=' . filemtime(FCPATH . 'js/dashboard/usuarios.js')) ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const tipoUsuario = "<?= session()->get('tipo_usuario') ?>";

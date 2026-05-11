@@ -41,6 +41,68 @@ function cargarCombo(endpoint, selectId, idField, textField) {
         .catch(err => console.error("Error cargando combo:", err));
 }
 
+function formatApiError(json, fallback = "Ocurrio un error desconocido") {
+    if (json && json.errors && typeof json.errors === 'object') {
+        return Object.values(json.errors).join('\n');
+    }
+
+    return (json && (json.message || json.exception || json.error_db || json.error)) || fallback;
+}
+
+const NAME_PATTERN = /^[\p{L}]+(?:\s+[\p{L}]+)*$/u;
+const ALIAS_PATTERN = /^[A-Za-z0-9]{3,25}$/;
+const PASSWORD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d).{8,72}$/;
+
+function showValidationError(message, fieldId) {
+    Swal.fire("Revise el formulario", message, "warning").then(() => {
+        document.getElementById(fieldId)?.focus();
+    });
+
+    return false;
+}
+
+function validateUserForm(form, isUpdate) {
+    const nombres = String(form.get('nombres_usuario') || '').trim();
+    const apellidos = String(form.get('apellidos_usuario') || '').trim();
+    const correo = String(form.get('correo_usuario') || '').trim();
+    const alias = String(form.get('alias_usuario') || '').trim();
+    const clave = String(form.get('clave_usuario') || '');
+    const confirmar = String(form.get('confirmar_clave') || '');
+    const rol = String(form.get('id_tipo') || '');
+
+    if (!NAME_PATTERN.test(nombres) || nombres.length < 2 || nombres.length > 30) {
+        return showValidationError("Los nombres deben tener de 2 a 30 caracteres y solo letras con espacios internos.", "nombres_usuario");
+    }
+
+    if (!NAME_PATTERN.test(apellidos) || apellidos.length < 2 || apellidos.length > 30) {
+        return showValidationError("Los apellidos deben tener de 2 a 30 caracteres y solo letras con espacios internos.", "apellidos_usuario");
+    }
+
+    if (!correo || correo.length > 100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+        return showValidationError("Ingrese un correo valido de maximo 100 caracteres.", "correo_usuario");
+    }
+
+    if (!ALIAS_PATTERN.test(alias)) {
+        return showValidationError("El alias debe tener de 3 a 25 caracteres y solo letras o numeros.", "alias_usuario");
+    }
+
+    if (!rol || Number.isNaN(Number(rol))) {
+        return showValidationError("Seleccione un rol valido.", "id_tipo_usuario");
+    }
+
+    if (!isUpdate || clave) {
+        if (!PASSWORD_PATTERN.test(clave)) {
+            return showValidationError("La clave debe tener minimo 8 caracteres e incluir al menos una letra y un numero.", "clave_usuario");
+        }
+
+        if (clave !== confirmar) {
+            return showValidationError("La confirmacion de clave no coincide.", "confirmar_clave");
+        }
+    }
+
+    return true;
+}
+
 
 
 // ===============================
@@ -61,7 +123,7 @@ function cargarUsuarios() {
                     Swal.fire("Sin datos", "No se encontraron usuarios.", "info");
                 }
             } else {
-                Swal.fire("Error", json.exception, "error");
+                Swal.fire("Error", formatApiError(json, "No se pudo cargar usuarios"), "error");
             }
         })
         .catch(() => Swal.fire("Error", "No se pudo cargar la tabla", "error"));
@@ -167,7 +229,7 @@ window.openUpdateDialog = function (id) {
     })
     .then(res => res.json())
     .then(json => {
-        if (!json.status) return Swal.fire("Error", json.exception, "error");
+        if (!json.status) return Swal.fire("Error", formatApiError(json, "No se pudo leer el usuario"), "error");
 
         const d = json.dataset;
 
@@ -210,6 +272,10 @@ document.getElementById('save-form').addEventListener('submit', e => {
     const isUpdate = form.get('id_usuario') !== '';
     const action = isUpdate ? 'update' : 'create';
 
+    if (!validateUserForm(form, isUpdate)) {
+        return;
+    }
+
     fetch(API_USUARIOS + action, {
         method: 'POST',
         body: form
@@ -218,14 +284,7 @@ document.getElementById('save-form').addEventListener('submit', e => {
     .then(json => {
         console.log(json);//Para ver la respuesta del json en la consola
         if (!json.status) {
-            let errorMessage = 
-                json.exception ||
-                json.error_db ||
-                JSON.stringify(json.errors) ||
-                json.message ||
-                "Ocurrió un error desconocido";
-
-            Swal.fire("Error", errorMessage, "error");
+            Swal.fire("Error", formatApiError(json), "error");
             return;
         }
 
@@ -263,7 +322,7 @@ window.openDeleteDialog = function (id) {
                 .then(res => res.json())
                 .then(json => {
                     console.log(json);
-                    if (!json.status) return Swal.fire("Error", json.exception, "error");
+                    if (!json.status) return Swal.fire("Error", formatApiError(json, "No se pudo dar de baja el usuario"), "error");
 
                     Swal.fire("Eliminado", "Usuario eliminado correctamente", "success");
                     cargarUsuarios();
