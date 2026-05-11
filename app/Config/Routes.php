@@ -6,24 +6,27 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-$routes->get('/', 'Dashboard::index', ['filter' => 'guest']); // Página de login (no protegida)
-$routes->get('/dashboard', 'Dashboard::index', ['filter' => 'guest']); // Página de login (no protegida)
-$routes->post('/api/auth/login', 'Auth::login'); // API de login (no protegida)
-$routes->post('/api/auth/google', 'Auth::google'); // API de login con Google (no protegida)
-$routes->get('/api/auth/exists', 'Auth::exists'); // API para verificar usuarios (no protegida)
-$routes->get('/api/auth/logOut', 'Auth::logOut', ['filter' => 'auth']); // API de logout protegida
+// Rutas publicas: login tradicional, login con Google y verificacion inicial.
+$routes->get('/', 'Dashboard::index', ['filter' => 'guest']);
+$routes->get('/dashboard', 'Dashboard::index', ['filter' => 'guest']);
+$routes->post('/api/auth/login', 'Auth::login');
+$routes->post('/api/auth/google', 'Auth::google');
+$routes->get('/api/auth/exists', 'Auth::exists');
+
+// Rutas de autenticacion protegidas: requieren sesion iniciada.
+$routes->get('/api/auth/logOut', 'Auth::logOut', ['filter' => 'auth']);
 $routes->get('/api/auth/index', 'Auth::index', ['filter' => 'auth:users.view']);
-// Rutas protegidas (requieren login)
-$routes->get('/main', 'Main::main', ['filter' => 'auth']); // Página del dashboard protegida
+
+// Vistas principales protegidas. Algunas solo piden sesion y otras permisos RBAC.
+$routes->get('/main', 'Main::main', ['filter' => 'auth']);
 $routes->get('/usuarios1', 'Usuarios1::usuarios1', ['filter' => 'auth:users.view']);
 $routes->get('/roles', 'Roles::roles', ['filter' => 'auth:roles.view']);
 $routes->get('/perfil', 'Perfil::perfil', ['filter' => 'auth']);
 $routes->get('/servicios', 'Servicios::servicios', ['filter' => 'auth:services.view']);
 $routes->get('/ticket', 'Ticket::ticket', ['filter' => 'auth:tickets.view']);
-// Agrega más rutas protegidas aquí, por ejemplo:
-// $routes->get('/perfil', 'Usuario::perfil', ['filter' => 'auth']);
 
-$routes->group('api/usuarios/', ['namespace' => 'App\Controllers'], function($routes){
+// API de usuarios: CRUD administrativo y lectura/actualizacion del perfil propio.
+$routes->group('api/usuarios/', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->get('index', 'Usuarios::index', ['filter' => 'auth:users.view']);
     $routes->post('readOne', 'Usuarios::readOne', ['filter' => 'auth:users.view']);
     $routes->get('readPerfil', 'Usuarios::readPerfil', ['filter' => 'auth']);
@@ -33,19 +36,19 @@ $routes->group('api/usuarios/', ['namespace' => 'App\Controllers'], function($ro
     $routes->post('search', 'Usuarios::search', ['filter' => 'auth:users.view']);
     $routes->post('deletelogic', 'Usuarios::deletelogic', ['filter' => 'auth:users.delete']);
     $routes->post('updatePerfil', 'Usuarios::updatePerfil', ['filter' => 'auth']);
-    //$routes->get('test', 'Usuarios::test');
-    // RUTAS FALTANTES
     $routes->get('getTipo', 'Usuarios::getTipo', ['filter' => 'auth:users.view']);
     $routes->get('getEstado', 'Usuarios::getEstado', ['filter' => 'auth:users.view']);
 });
 
-$routes->group('api/notas/', ['namespace' => 'App\Controllers'], function($routes){
+// API de notas: registra comentarios y solicitudes de cierre en el historial del ticket.
+$routes->group('api/notas/', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->post('index', 'Notas::index', ['filter' => 'auth:tickets.view']);
     $routes->post('create', 'Notas::create', ['filter' => 'auth:tickets.update']);
     $routes->post('createRequest', 'Notas::createRequest', ['filter' => 'auth:tickets.update']);
 });
 
-$routes->group('api/tickets/', ['namespace' => 'App\Controllers'], function($routes){
+// API de tickets: separa bandejas por rol y protege cada accion con permisos.
+$routes->group('api/tickets/', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->get('index', 'Tickets::index', ['filter' => 'auth:tickets.view']);
     $routes->get('supporTickets', 'Tickets::supporTickets', ['filter' => 'auth:tickets.view']);
     $routes->get('userTickets', 'Tickets::userTickets', ['filter' => 'auth:tickets.view']);
@@ -56,15 +59,12 @@ $routes->group('api/tickets/', ['namespace' => 'App\Controllers'], function($rou
     $routes->post('search', 'Tickets::search', ['filter' => 'auth:tickets.view']);
     $routes->post('deletelogic', 'Tickets::deletelogic', ['filter' => 'auth:tickets.delete']);
     $routes->post('updatePerfil', 'Tickets::updatePerfil', ['filter' => 'auth:tickets.update']);
-    //$routes->get('test', 'Usuarios::test');
-    // RUTAS FALTANTES
     $routes->get('getServices', 'Tickets::getServices', ['filter' => 'auth:tickets.view']);
     $routes->get('getUsuarios', 'Tickets::getUsuarios', ['filter' => 'auth:tickets.view']);
 });
 
-
-
-$routes->group('api/services/', ['namespace' => 'App\Controllers'], function($routes){
+// API del catalogo de servicios de TI.
+$routes->group('api/services/', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->get('index', 'Services::index', ['filter' => 'auth:services.view']);
     $routes->post('readOne', 'Services::readOne', ['filter' => 'auth:services.view']);
     $routes->post('create', 'Services::create', ['filter' => 'auth:services.create']);
@@ -75,21 +75,13 @@ $routes->group('api/services/', ['namespace' => 'App\Controllers'], function($ro
     $routes->get('getTipo', 'Services::getTipo', ['filter' => 'auth:services.view']);
 });
 
-$routes->group('api/rolest/', ['namespace' => 'App\Controllers'], function($routes){
+// API auxiliar para listar roles.
+$routes->group('api/rolest/', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->get('index', 'Rolest::index', ['filter' => 'auth:roles.view']);
 });
 
-
-
-
-$routes->group('api/permisos/', ['namespace' => 'App\Controllers'], function($routes){
+// API de permisos: permite consultar y actualizar permisos por rol/modulo.
+$routes->group('api/permisos/', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->post('readByRoleAndModule', 'Permisos::readByRoleAndModule', ['filter' => 'auth:roles.view']);
-    $routes->post('updateByRoleAndModule', 'Permisos::updateByRoleAndModule', ['filter' => 'auth:roles.update']); 
+    $routes->post('updateByRoleAndModule', 'Permisos::updateByRoleAndModule', ['filter' => 'auth:roles.update']);
 });
-
-
-
-
-
-
-

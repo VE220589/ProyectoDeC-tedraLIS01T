@@ -4,6 +4,7 @@ metadata:
   name: tmnotes-config
   namespace: tmnotes
 data:
+  # Configuracion no sensible de la aplicacion.
   CI_ENVIRONMENT: production
   APP_BASE_URL: http://localhost/
   app.baseURL: http://localhost/
@@ -24,6 +25,7 @@ metadata:
   name: tmnotes-app
   namespace: tmnotes
 spec:
+  # Dos replicas demuestran escalabilidad horizontal y tolerancia basica a fallos.
   replicas: 2
   selector:
     matchLabels:
@@ -35,6 +37,7 @@ spec:
     spec:
       containers:
         - name: app
+          # Imagen local construida con: docker build -t tmnotes-app:latest .
           image: tmnotes-app:latest
           imagePullPolicy: IfNotPresent
           ports:
@@ -43,6 +46,7 @@ spec:
             - configMapRef:
                 name: tmnotes-config
           env:
+            # La clave de la BD se toma desde Secret, no desde ConfigMap.
             - name: database.default.password
               valueFrom:
                 secretKeyRef:
@@ -54,18 +58,21 @@ spec:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
           readinessProbe:
+            # Kubernetes solo envia trafico cuando la app responde.
             httpGet:
               path: /
               port: 80
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
+            # Si la app deja de responder, Kubernetes reinicia el contenedor.
             httpGet:
               path: /
               port: 80
             initialDelaySeconds: 30
             periodSeconds: 20
           volumeMounts:
+            # Directorio writable de CodeIgniter para logs/cache/sesiones.
             - name: writable
               mountPath: /var/www/html/writable
       volumes:
@@ -78,6 +85,7 @@ metadata:
   name: tmnotes-app
   namespace: tmnotes
 spec:
+  # NodePort expone la app en localhost:30080 cuando se usa Docker Desktop Kubernetes.
   type: NodePort
   selector:
     app: tmnotes-app

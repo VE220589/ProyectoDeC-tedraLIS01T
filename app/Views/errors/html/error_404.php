@@ -12,8 +12,8 @@ $detail = ENVIRONMENT !== 'production' && ! empty($message) ? $message : 'La pag
     <title>Pagina no encontrada</title>
     <style>
         :root {
-            --teal: #00695c;
-            --teal-dark: #004d40;
+            --teal: #26a69a;
+            --teal-dark: #26a69a;
             --teal-light: #26a69a;
             --blue: #1565c0;
             --surface: #ffffff;
@@ -181,6 +181,5 @@ $detail = ENVIRONMENT !== 'production' && ! empty($message) ? $message : 'La pag
         </section>
     </main>
 
-    <footer>Derechos reservados <?= date('Y') ?></footer>
 </body>
 </html>

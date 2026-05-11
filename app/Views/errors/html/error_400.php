@@ -12,7 +12,7 @@ $detail = ENVIRONMENT !== 'production' && ! empty($message) ? $message : 'La sol
     <title>Solicitud no valida</title>
     <style>
         :root {
-            --teal: #00695c;
+            --teal: #26a69a;
             --blue: #1565c0;
             --surface: #ffffff;
             --text: #1f2933;

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     M.Tooltip.init(document.querySelectorAll('.tooltipped'));
 
-    // Verificar si existen usuarios
+    // Verifica si hay usuarios cargados antes de permitir el uso normal del login.
     fetch(API_AUTH + 'exists')
         .then(r => r.json())
         .then(response => {
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                 } else {
-                    // Cuando NO existen usuarios → redirigir a Registro
+                    // Cuando no existen usuarios, avisa que la base inicial debe revisarse.
                     Swal.fire({
                         icon: 'warning',
                         title: 'Sin usuarios registrados, revise la base de datos',
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// Evento para iniciar sesión
+// Login local: envia alias y contrasena al endpoint PHP.
 document.getElementById('session-form').addEventListener('submit', e => {
     e.preventDefault();
 
@@ -75,6 +75,7 @@ document.getElementById('session-form').addEventListener('submit', e => {
 });
 
 window.handleGoogleCredential = response => {
+    // Google devuelve un token firmado; el backend lo valida antes de iniciar sesion.
     const body = new FormData();
     body.append('credential', response.credential);
 
@@ -107,19 +108,34 @@ window.handleGoogleCredential = response => {
         });
 };
 
-window.addEventListener('load', () => {
-    if (!window.google || !GOOGLE_CLIENT_ID || !document.getElementById('google-login')) {
+const renderGoogleButton = () => {
+    const container = document.getElementById('google-login');
+
+    if (!window.google || !GOOGLE_CLIENT_ID || !container) {
         return;
     }
+
+    // El boton oficial de Google necesita un ancho numerico; se calcula segun la tarjeta.
+    const width = Math.max(220, Math.min(400, Math.floor(container.getBoundingClientRect().width)));
+    container.innerHTML = '';
 
     google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: handleGoogleCredential
     });
-    google.accounts.id.renderButton(document.getElementById('google-login'), {
+
+    google.accounts.id.renderButton(container, {
         theme: 'outline',
         size: 'large',
-        width: 320,
+        width,
         text: 'signin_with'
     });
+};
+
+window.addEventListener('load', renderGoogleButton);
+
+let googleResizeTimer = null;
+window.addEventListener('resize', () => {
+    clearTimeout(googleResizeTimer);
+    googleResizeTimer = setTimeout(renderGoogleButton, 150);
 });

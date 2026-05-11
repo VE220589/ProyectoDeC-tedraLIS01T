@@ -5,6 +5,7 @@ metadata:
   namespace: tmnotes
 type: Opaque
 stringData:
+  # En produccion real esta clave debe cambiarse y gestionarse como secreto.
   POSTGRES_PASSWORD: postgres
 ---
 apiVersion: v1
@@ -13,6 +14,7 @@ metadata:
   name: postgres-data
   namespace: tmnotes
 spec:
+  # Almacenamiento persistente para conservar la base aunque el pod se reinicie.
   accessModes:
     - ReadWriteOnce
   resources:
@@ -25,6 +27,7 @@ metadata:
   name: postgres
   namespace: tmnotes
 spec:
+  # La base de datos se mantiene con una sola replica para evitar conflictos de disco.
   replicas: 1
   selector:
     matchLabels:
@@ -50,8 +53,10 @@ spec:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
           volumeMounts:
+            # Datos reales de PostgreSQL.
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
+            # Script SQL inicial creado como ConfigMap antes de aplicar este manifiesto.
             - name: postgres-init
               mountPath: /docker-entrypoint-initdb.d
       volumes:
@@ -68,6 +73,7 @@ metadata:
   name: postgres
   namespace: tmnotes
 spec:
+  # Servicio interno para que la app use DB_HOST=postgres.
   selector:
     app: postgres
   ports:

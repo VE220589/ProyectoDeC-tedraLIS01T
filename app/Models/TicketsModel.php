@@ -12,6 +12,7 @@ class TicketsModel extends Model
     protected $useAutoIncrement = true; 
     protected $returnType = 'array';
 
+    // Campos permitidos para inserciones/actualizaciones masivas desde el controlador.
     protected $allowedFields = [
         'ticket_number',
         'title',
@@ -34,6 +35,8 @@ class TicketsModel extends Model
     
 public function getTicketsConJoin()
 {
+    // Vista global del administrador: une usuarios tres veces con alias
+    // porque un ticket tiene creador, tecnico asignado y usuario que cierra.
     return $this->select("
                 tickets.*,
                 s.description AS service_name,
@@ -53,6 +56,7 @@ public function getTicketsConJoin()
 
 public function getUserticketConJoin($idusuario = null)
 {
+    // Vista del usuario final: solo muestra tickets creados por su propia cuenta.
     return $this->select("
                 tickets.*,
                 s.description AS service_name,
@@ -73,6 +77,7 @@ public function getUserticketConJoin($idusuario = null)
 
 public function getSupportConJoin($idusuario = null)
 {
+    // Vista del tecnico: solo muestra tickets asignados al usuario en sesion.
     return $this->select("
                 tickets.*,
                 s.description AS service_name,

@@ -1,11 +1,14 @@
 services:
+  # Contenedor de la aplicacion PHP/CodeIgniter.
   app:
     build: .
     container_name: tmnotes_app
+    # Espera a que PostgreSQL este saludable antes de iniciar Apache/PHP.
     depends_on:
       db:
         condition: service_healthy
     environment:
+      # Variables usadas por Config\App y Config\Database dentro del contenedor.
       CI_ENVIRONMENT: production
       APP_BASE_URL: http://localhost:8080/
       DB_HOST: db
@@ -20,12 +23,16 @@ services:
       database.default.username: postgres
       database.default.password: postgres
       database.default.port: 5432
+      # Si se define en .env, habilita el boton y login con Google.
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     ports:
+      # Expone la aplicacion en http://localhost:8080.
       - "8080:80"
     volumes:
+      # Mantiene logs/cache/sesiones aunque el contenedor se recree.
       - app_writable:/var/www/html/writable
 
+  # Contenedor de base de datos PostgreSQL.
   db:
     image: postgres:16-alpine
     container_name: tmnotes_db
@@ -36,9 +43,12 @@ services:
     ports:
       - "5432:5432"
     volumes:
+      # Volumen persistente para no perder datos al reiniciar contenedores.
       - postgres_data:/var/lib/postgresql/data
+      # Script inicial que crea tablas, roles, permisos y datos semilla.
       - ./scriptdelabase.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
+      # Docker usa esta prueba para saber cuando la BD ya acepta conexiones.
       test: ["CMD-SHELL", "pg_isready -U postgres -d tmnotes"]
       interval: 10s
       timeout: 5s

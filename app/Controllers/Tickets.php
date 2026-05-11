@@ -16,6 +16,7 @@ class Tickets extends ResourceController
     public function index()
     {
         try {
+            // Bandeja global para administradores: muestra todos los tickets.
             $model = new TicketsModel();
             $data = $model->getTicketsConJoin();
 
@@ -34,6 +35,7 @@ class Tickets extends ResourceController
 
     public function supporTickets()
     {
+        // Bandeja del tecnico: filtra por el usuario asignado en la sesion.
         $idUsuario = session()->get('id_usuario');
         try {
             $model = new TicketsModel();
@@ -54,6 +56,7 @@ class Tickets extends ResourceController
 
     public function userTickets()
     {
+        // Bandeja del usuario final: filtra por tickets creados por el usuario en sesion.
         $idUsuario = session()->get('id_usuario');
         try {
             $model = new TicketsModel();
@@ -286,7 +289,7 @@ class Tickets extends ResourceController
         $activitiesModel = new NotasModel(); // <-- Modelo para ticket_activities
 
         // ------------------------------------------------------------
-        // 1. Cerrar el ticket
+        // 1. Cerrar el ticket y guardar quien realizo el cierre.
         // ------------------------------------------------------------
         $data = [
             'status'    => 'closed',
@@ -296,7 +299,7 @@ class Tickets extends ResourceController
         $ticketsModel->update($id, $data);
 
         // ------------------------------------------------------------
-        // 2. Registrar la nota de cierre
+        // 2. Registrar la nota de cierre para conservar trazabilidad.
         // ------------------------------------------------------------
         $nota = [
             'ticket_id' => $id,

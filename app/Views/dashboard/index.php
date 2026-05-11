@@ -28,6 +28,41 @@
         display: block;
         margin: 0 auto 15px;
     }
+
+    .login-card .btn {
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .google-login-wrapper {
+        width: 100%;
+        max-width: 100%;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    #google-login {
+        width: 100%;
+        max-width: 100%;
+        min-height: 44px;
+    }
+
+    #google-login > div,
+    #google-login iframe {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    @media (max-width: 600px) {
+        .login-card {
+            padding: 24px 18px;
+        }
+
+        .brand-logo-login {
+            height: 70px;
+        }
+    }
 </style>
 
 <div class="container">
@@ -55,14 +90,14 @@
                     </div>
 
                     <div class="center-align" style="margin-top: 20px;">
-                        <button type="submit" class="btn waves-effect waves-light blue darken-3" style="width: 100%; border-radius: 8px;">
+                        <button type="submit" class="btn waves-effect waves-light blue darken-3">
                             <i class="material-icons left">send</i>Ingresar
                         </button>
                     </div>
                 </form>
 
                 <?php if (env('GOOGLE_CLIENT_ID')): ?>
-                    <div class="center-align" style="margin-top: 18px;">
+                    <div class="google-login-wrapper">
                         <div id="google-login"></div>
                     </div>
                 <?php endif; ?>
@@ -75,7 +110,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<script src="<?= base_url('js/dashboard/index.js') ?>"></script>
+<script src="<?= base_url('js/dashboard/index.js?v=' . filemtime(FCPATH . 'js/dashboard/index.js')) ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const URL_MAIN = "<?= base_url('main') ?>";

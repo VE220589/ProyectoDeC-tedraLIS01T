@@ -1,8 +1,15 @@
+# No enviar al build archivos que no necesita la imagen.
 .git
 vendor
+
+# Temporales generados por CodeIgniter o herramientas locales.
 writable/cache/*
 writable/debugbar/*
 writable/logs/*
 writable/session/*
+writable/tmp/*
+writable/docx_preview/*
+
+# Pruebas y configuracion local no se copian a produccion.
 tests
 phpunit.xml.dist

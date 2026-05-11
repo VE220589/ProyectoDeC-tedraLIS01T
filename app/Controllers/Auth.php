@@ -7,6 +7,7 @@ use CodeIgniter\RESTful\ResourceController;
 
 class Auth extends ResourceController
 {
+    // Todas las respuestas de este controlador se entregan como JSON.
     protected $format = 'json';
 
     public function loginView()
@@ -36,6 +37,7 @@ class Auth extends ResourceController
     public function exists()
     {
         try {
+            // El login usa esta verificacion para avisar si la base no tiene usuarios cargados.
             $model = new UsuarioModel();
             $count = $model->countAllResults();
 
@@ -55,6 +57,7 @@ class Auth extends ResourceController
     public function login()
     {
         try {
+            // Acepta credenciales enviadas como formulario tradicional o como JSON.
             $alias = $this->request->getPost('alias_usuario') ?? $this->request->getJSONVar('alias_usuario');
             $clave = $this->request->getPost('clave_usuario') ?? $this->request->getJSONVar('clave_usuario');
 
@@ -66,11 +69,13 @@ class Auth extends ResourceController
             }
 
             $model = new UsuarioModel();
+            // Se une con roles para guardar el nombre del rol y su id dentro de la sesion.
             $user = $model->select('users.*, roles.name as tipo_usuario, roles.id as role_id')
                 ->join('roles', 'roles.id = users.role_id')
                 ->where('users.username', $alias)
                 ->first();
 
+            // La contrasena nunca se compara en texto plano; se valida contra el hash.
             if (! $user || ! password_verify($clave, $user['password_hash'])) {
                 return $this->respond([
                     'status' => false,
@@ -103,6 +108,7 @@ class Auth extends ResourceController
     public function google()
     {
         try {
+            // Google Identity Services envia un ID token firmado en "credential" o "id_token".
             $credential = $this->request->getPost('credential')
                 ?? $this->request->getPost('id_token')
                 ?? $this->request->getJSONVar('credential')
@@ -125,12 +131,15 @@ class Auth extends ResourceController
             }
 
             $model = new UsuarioModel();
+            // Si el correo ya existe, se reutiliza la cuenta local asociada a ese email.
             $user = $model->select('users.*, roles.name as tipo_usuario, roles.id as role_id')
                 ->join('roles', 'roles.id = users.role_id')
                 ->where('users.email', $profile['email'])
                 ->first();
 
             if (! $user) {
+                // Si es un correo nuevo, se registra como usuario final.
+                // La contrasena interna es aleatoria porque el acceso real sera por Google.
                 $nameParts = explode(' ', trim($profile['name'] ?? 'Usuario Google'), 2);
                 $model->insert([
                     'username' => $this->buildGoogleUsername($profile['email']),
@@ -183,6 +192,7 @@ class Auth extends ResourceController
     private function startUserSession(array $user, string $authProvider = 'local'): void
     {
         $db = \Config\Database::connect();
+        // Carga los permisos activos del rol para que el filtro y la interfaz apliquen RBAC.
         $permisosDB = $db->query(
             "SELECT p.name
              FROM permissions p
@@ -192,6 +202,7 @@ class Auth extends ResourceController
             [$user['role_id']]
         )->getResultArray();
 
+        // Regenera el ID de sesion para reducir riesgo de fijacion de sesion.
         session()->regenerate(true);
         session()->set([
             'id_usuario' => $user['id'],
@@ -213,6 +224,7 @@ class Auth extends ResourceController
             throw new \RuntimeException('Configure GOOGLE_CLIENT_ID para habilitar Google Login.');
         }
 
+        // Valida el token directamente con Google y confirma que pertenece a este Client ID.
         $client = \Config\Services::curlrequest([
             'timeout' => 5,
             'http_errors' => false,
@@ -241,6 +253,7 @@ class Auth extends ResourceController
     private function getDefaultRoleId(): int
     {
         $db = \Config\Database::connect();
+        // Las cuentas creadas desde Google entran con el rol mas limitado.
         $role = $db->table('roles')->select('id')->where('name', 'end_user')->get()->getRowArray();
 
         if (! $role) {
@@ -252,6 +265,7 @@ class Auth extends ResourceController
 
     private function buildGoogleUsername(string $email): string
     {
+        // Genera un alias unico a partir del correo para cumplir la restriccion UNIQUE.
         $base = strtolower(preg_replace('/[^a-z0-9]/i', '', strtok($email, '@') ?: 'google'));
         $base = substr($base, 0, 18) ?: 'google';
         $candidate = $base;

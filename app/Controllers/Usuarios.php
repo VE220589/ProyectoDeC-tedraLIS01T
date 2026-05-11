@@ -61,6 +61,7 @@ class Usuarios extends ResourceController
     public function readPerfil()
     {
         try {
+            // El usuario final puede leer su propio perfil sin tener permiso users.view.
             $id = session()->get('id_usuario');
 
             if (!$id) {
@@ -215,6 +216,7 @@ class Usuarios extends ResourceController
         }
 
         if ((int) session()->get('id_usuario') !== (int) $id) {
+            // Evita que un usuario modifique datos de otra cuenta cambiando el id en el formulario.
             return $this->respond([
                 'status' => false,
                 'message' => 'No puede modificar el perfil de otro usuario'
@@ -228,6 +230,8 @@ class Usuarios extends ResourceController
         $claveNueva = $this->request->getPost('clave_usuario');
         $isGoogleUser = session()->get('auth_provider') === 'google';
 
+        // Solo se exige clave actual si el usuario local intenta cambiar su contrasena.
+        // Las cuentas Google no conocen una clave local porque el acceso se valida con Google.
         if (!$isGoogleUser && $claveNueva && (!$claveActual || !password_verify($claveActual, $usuarioActual['password_hash']))) {
             return $this->respond([
                 'status' => false,
