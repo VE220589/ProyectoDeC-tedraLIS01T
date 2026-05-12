@@ -5,11 +5,11 @@
     <meta charset="utf-8">
     <title>Dashboard - <?= $this->renderSection('title') ?></title>
 
-    <link rel="icon" type="image/png" href="<?= base_url('resources/img/logo.png') ?>">
-    <link rel="stylesheet" href="<?= base_url('resources/css/materialize.min.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('resources/css/material_icons.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('resources/datatable/dataTables.min.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('resources/css/dashboard.css') ?>">
+    <link rel="icon" type="image/png" href="/resources/img/logo.png">
+    <link rel="stylesheet" href="/resources/css/materialize.min.css">
+    <link rel="stylesheet" href="/resources/css/material_icons.css">
+    <link rel="stylesheet" href="/resources/datatable/dataTables.min.css">
+    <link rel="stylesheet" href="/resources/css/dashboard.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
@@ -19,7 +19,7 @@
                         <div class="navbar-fixed">
                             <nav class="teal">
                                 <div class="nav-wrapper">
-                                    <a href="<?= base_url('main') ?>" class="brand-logo right"><img src="<?= base_url('resources/img/logo.png') ?>" height="60"></a>
+                                    <a href="/main" class="brand-logo right"><img src="/resources/img/logo.png" height="60"></a>
                                     <a href="#" data-target="mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                                     <ul class="left hide-on-med-and-down">
                                         <?php if (in_array('roles.view', session('permissions'))): ?>
@@ -76,14 +76,16 @@
 </footer>
 
 
-<script src="<?= base_url('resources/js/materialize.min.js') ?>"></script>
-<script src="<?= base_url('resources/js/sweetalert.min.js') ?>"></script>
-<script src="<?= base_url('resources/components.js') ?>"></script>
-<script src="<?= base_url('js/dashboard/initialization.js') ?>"></script>
-<script src="<?= base_url('resources/datatable/jquery-3.7.1.min.js') ?>"></script>
-<script src="<?= base_url('resources/datatable/dataTables.min.js') ?>"></script>
+<script src="/resources/js/materialize.min.js"></script>
+<script src="/resources/js/sweetalert.min.js"></script>
+<script src="/resources/components.js"></script>
+<script src="/js/dashboard/initialization.js"></script>
+<script src="/resources/datatable/jquery-3.7.1.min.js"></script>
+<script src="/resources/datatable/dataTables.min.js"></script>
 <script>
-    const API_AUTH = "<?= base_url('api/auth/') ?>";
+    const APP_ORIGIN = window.location.origin;
+    const appUrl = path => `${APP_ORIGIN}/${String(path).replace(/^\/+/, '')}`;
+    const API_AUTH = appUrl('api/auth/');
 </script>
 <?= $this->renderSection('scripts') ?>
 

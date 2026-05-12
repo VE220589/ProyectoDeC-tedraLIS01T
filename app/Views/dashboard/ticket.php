@@ -185,8 +185,8 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<script src="<?= base_url('js/dashboard/main.js') ?>"></script>
-<script src="<?= base_url('js/dashboard/tickets.js?v=' . filemtime(FCPATH . 'js/dashboard/tickets.js')) ?>"></script>
+<script src="/js/dashboard/main.js"></script>
+<script src="/js/dashboard/tickets.js?v=<?= filemtime(FCPATH . 'js/dashboard/tickets.js') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const tipoUsuario = "<?= session()->get('tipo_usuario') ?>";
@@ -195,10 +195,10 @@
     const ROLE_ID = <?= session()->get('role_id') ?>;
 </script>
 <script>
-    const MAIN_URL = "<?= base_url('main') ?>";
-    const BASE_URL = "<?= base_url('dashboard') ?>";
-    const API_TICKETS  = "<?= base_url('api/tickets/') ?>";
-    const API_NOTAS  = "<?= base_url('api/notas/') ?>";
+    const MAIN_URL = appUrl('main');
+    const BASE_URL = appUrl('dashboard');
+    const API_TICKETS  = appUrl('api/tickets/');
+    const API_NOTAS  = appUrl('api/notas/');
 </script>
 <?= $this->endSection() ?>
 

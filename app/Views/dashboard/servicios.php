@@ -72,15 +72,15 @@
 <script>
     const USER_PERMISSIONS = <?= json_encode(session('permissions')); ?>;
 </script>
-<script src="<?= base_url('js/dashboard/main.js') ?>"></script>
-<script src="<?= base_url('js/dashboard/servicios.js?v=' . filemtime(FCPATH . 'js/dashboard/servicios.js')) ?>"></script>
+<script src="/js/dashboard/main.js"></script>
+<script src="/js/dashboard/servicios.js?v=<?= filemtime(FCPATH . 'js/dashboard/servicios.js') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const tipoUsuario = "<?= session()->get('tipo_usuario') ?>";
 </script>
 <script>
-    const BASE_URL = "<?= base_url('dashboard') ?>";
-    const API_SERVICIOS = "<?= base_url('api/services/') ?>";
+    const BASE_URL = appUrl('dashboard');
+    const API_SERVICIOS = appUrl('api/services/');
 </script>
 <?= $this->endSection() ?>
 

@@ -71,15 +71,15 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<script src="<?= base_url('js/dashboard/main.js') ?>"></script>
-<script src="<?= base_url('js/dashboard/roles.js?v=' . filemtime(FCPATH . 'js/dashboard/roles.js')) ?>"></script>
+<script src="/js/dashboard/main.js"></script>
+<script src="/js/dashboard/roles.js?v=<?= filemtime(FCPATH . 'js/dashboard/roles.js') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const tipoUsuario = "<?= session()->get('tipo_usuario') ?>";
 </script>
 <script>
-    const BASE_URL = "<?= base_url('dashboard') ?>";
-    const API_ROLES = "<?= base_url('api/rolest/') ?>";
-    const API_PERMI = "<?= base_url('api/permisos/') ?>";
+    const BASE_URL = appUrl('dashboard');
+    const API_ROLES = appUrl('api/rolest/');
+    const API_PERMI = appUrl('api/permisos/');
 </script>
 <?= $this->endSection() ?>

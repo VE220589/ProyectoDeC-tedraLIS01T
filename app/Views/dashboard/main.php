@@ -33,13 +33,13 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<script src="<?= base_url('js/dashboard/main.js') ?>"></script>
+<script src="/js/dashboard/main.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    const TICKET_URL = "<?= base_url('ticket') ?>";
-    const BASE_URL = "<?= base_url('dashboard') ?>";
+    const TICKET_URL = appUrl('ticket');
+    const BASE_URL = appUrl('dashboard');
     const ROLE_ID  = <?= session('role_id'); ?>;
-    const API_TICKETS  = "<?= base_url('api/tickets/') ?>";
+    const API_TICKETS  = appUrl('api/tickets/');
     
 </script>
 

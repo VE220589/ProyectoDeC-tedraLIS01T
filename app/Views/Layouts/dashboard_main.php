@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>Dashboard - <?= $this->renderSection('title') ?></title>
 
-    <link rel="icon" type="image/png" href="<?= base_url('resources/img/logo.png') ?>">
-    <link rel="stylesheet" href="<?= base_url('resources/css/materialize.min.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('resources/css/material_icons.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('resources/css/dashboard.css') ?>">
+    <link rel="icon" type="image/png" href="/resources/img/logo.png">
+    <link rel="stylesheet" href="/resources/css/materialize.min.css">
+    <link rel="stylesheet" href="/resources/css/material_icons.css">
+    <link rel="stylesheet" href="/resources/css/dashboard.css">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
@@ -24,9 +24,13 @@
     <?= $this->renderSection('content') ?>
 </main>
 
-<script src="<?= base_url('resources/js/materialize.min.js') ?>"></script>
-<script src="<?= base_url('resources/js/sweetalert.min.js') ?>"></script>
-<script src="<?= base_url('resources/components.js') ?>"></script>
+<script src="/resources/js/materialize.min.js"></script>
+<script src="/resources/js/sweetalert.min.js"></script>
+<script src="/resources/components.js"></script>
+<script>
+    const APP_ORIGIN = window.location.origin;
+    const appUrl = path => `${APP_ORIGIN}/${String(path).replace(/^\/+/, '')}`;
+</script>
 <?= $this->renderSection('scripts') ?>
 
 </body>

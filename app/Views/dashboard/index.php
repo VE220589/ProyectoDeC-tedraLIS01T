@@ -71,11 +71,11 @@
             <div class="card login-card z-depth-3 white">
 
                 <!-- Logo -->
-                <img src="<?= base_url('resources/img/logo.png') ?>" height="80" class="brand-logo-login">
+                <img src="/resources/img/logo.png" height="80" class="brand-logo-login">
 
                 <h5 class="center-align">Bienvenido</h5>
 
-                <form method="post" id="session-form" action="<?= base_url('api/auth/login') ?>">
+                <form method="post" id="session-form" action="/api/auth/login">
 
                     <div class="input-field">
                         <i class="material-icons prefix">person</i>
@@ -110,14 +110,14 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<script src="<?= base_url('js/dashboard/index.js?v=' . filemtime(FCPATH . 'js/dashboard/index.js')) ?>"></script>
+<script src="/js/dashboard/index.js?v=<?= filemtime(FCPATH . 'js/dashboard/index.js') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    const URL_MAIN = "<?= base_url('main') ?>";
+    const URL_MAIN = appUrl('main');
 </script>
 <script>
-    const BASE_URL = "<?= base_url('dashboard') ?>";
-    const API_AUTH = "<?= base_url('api/auth/') ?>";
+    const BASE_URL = appUrl('dashboard');
+    const API_AUTH = appUrl('api/auth/');
     const GOOGLE_CLIENT_ID = "<?= esc(env('GOOGLE_CLIENT_ID') ?? '') ?>";
 </script>
 <?php if (env('GOOGLE_CLIENT_ID')): ?>
